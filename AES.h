@@ -21,6 +21,7 @@ namespace AES_NAMESPACE{
         /** Sub Bytes **/
 
         /** Shift Rows **/
+								void ShiftRows();
 
         /** Mix Columns 
             Galois Field matrix multiplication **/
