@@ -25,6 +25,7 @@ namespace AES_NAMESPACE{
 
         /** Mix Columns 
             Galois Field matrix multiplication **/
+                void mixColumns();
 
         /** Add Round Key **/
 
