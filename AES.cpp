@@ -13,16 +13,31 @@ AES::~AES()
     
 }
 
-uint32_t AES::cypher(uint8_t *buffer, uint32_t size, uint8_t* key)
+uint32_t AES::encrypt(uint8_t *buffer, uint32_t size, uint8_t* key)
 {
     //check if block size if %16
     //either pad or throw error
+    return 0;
+}
+
+void AES::debugPrint()
+{
+    printf("\n");
+    for (int x = 0; x < 4; x++)
+    {
+        for (int y = 0; y < 4; y++)
+        {
+            printf("%#04x ", block[x][y]);
+        }
+        printf("\n");
+    }
 }
 
 void AES::SubBytes(uint8_t *buffer) {
+    
     for(int i = 0; i < MATRIX_SIZE; ++i) {
         for(int j = 0; j < MATRIX_SIZE; ++j) {
-          block[j][i] = buffer;
+          block[j][i] = buffer[i * MATRIX_SIZE + j];
         }
     }  
 }
