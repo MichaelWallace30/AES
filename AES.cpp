@@ -19,6 +19,15 @@ uint32_t AES::cypher(uint8_t *buffer, uint32_t size, uint8_t* key)
     //either pad or throw error
 }
 
+void AES::SubBytes(uint8_t *buffer) {
+    for(int i = 0; i < MATRIX_SIZE; ++i) {
+        for(int j = 0; j < MATRIX_SIZE; ++j) {
+          block[j][i] = buffer;
+        }
+    }  
+}
+
+
 void AES::SBox() 
 {
     uint8_t x_coord = 0, y_coord = 0; // x & y coord of the Rijndael S-Box
