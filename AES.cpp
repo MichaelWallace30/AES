@@ -33,6 +33,22 @@ void AES::debugPrint()
     }
 }
 
+uint8_t[SBOX_SIZE, SBOX_SIZE] AES::GenerateInverseSBox(uint8_t sBox[SBOX_SIZE][SBOX_SIZE])
+{
+		uint8_t inverseSBox[SBOX_SIZE][SBOX_SIZE];
+		for (int i = 0; i < SBOX_SIZE; i++) {
+				for (int j = 0; j < SBOX_SIZE; j++) {
+						uint8_t val = sBox[i][j];
+						uint8_t x = (val >> 4) & 0x0f;
+						uint8_t y = val & 0x0f;
+						uint8_t pos = (j & 0x0f);
+						pos |= (i & 0x0f) << 4;
+						inverseSBox[x][y] = pos;
+				}
+		}
+		return inverseSBox;
+}
+
 void AES::SubBytes(uint8_t *buffer) {
     
     for(int i = 0; i < MATRIX_SIZE; ++i) {
@@ -55,6 +71,17 @@ void AES::SBox()
     }
 }
 
+void AES::InverseSBox()
+{
+		for (int i = 0; i < MATRIX_SIZE; i++) {
+				for (int j = 0; j < MATRIX_SIZE; j++) {
+						uint8_t x = (block[i][j] & 0xf0) >> 4;
+						uint8_t y = (block[i][j] & 0x0f);
+						block[i][k] = INVERSE_S_BOX[x][y];
+				}
+		}
+}
+
 void AES::ShiftRows() {
     /**
     Iterate through rows of matrix starting at row 1
@@ -66,6 +93,21 @@ void AES::ShiftRows() {
         */
         std::rotate(&block[y][0], &block[y][y], &block[y][MATRIX_SIZE]);
     }
+}
+
+void AES::InverseShiftRows() {
+		/**
+		Iterate through rows of matrix starting at row 1
+		*/
+		for (int y = 1; y < MATRIX_SIZE; y++) {
+				/**
+				Move elements between the end of the array and end of the array - y to
+				the beginning of the array
+				*/
+				std::rotate(std::reverse_iterator<uint8_t*>(std::end(block[y])),
+						std::reverse_iterator<uint8_t*>(std::end(block[y])) + y,
+						std::reverse_iterator<uint8_t*>(block[y]));
+		}
 }
 
 /**
