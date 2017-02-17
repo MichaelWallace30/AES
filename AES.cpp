@@ -111,28 +111,32 @@ void AES::InverseShiftRows() {
 }
 
 /**
- * performs the mix column step of AES
- * @param stateColumn column of the state key to be mixed
+ * Performs the mix Column step of AES. Takes a column from an array and multiplies it against
+ * the galois field
+ * @param stateColumn current column being multiplied
  */
-void AES::mixColumns(uint8_t *stateColumn) {
-    uint8_t col1[4];//for the parts that are only being multiplied by 1
-    uint8_t colAdj[4];//for the parts being multiplied by 2 or 3
-    uint8_t t;//for storing the leftmost bit
-    /**
-    * Iterating through the state column, copying it to col1. The values from col1 are
-    * multiplied by 2 and stored in colAdj and conditionally xored by 0x1b.
-    */
-    for (int c = 0; c < 4; c++) {
-        col1[c] = stateColumn[c];
-        t = stateColumn[c] >> 7;
-        colAdj[c] = stateColumn[c] << 1 ^ 0x1b & t;
-    }
-    /**
-    * Values multiplies by 2 and 3 are taken from coldAdj. Values multiplied by 1
-    * are taken from col1. An extra value is added in for the valued multiplied by 3
-    */
-    stateColumn[0] = colAdj[0] ^ colAdj[1] ^ col1[1] ^ col1[2] ^ col1[3];
-    stateColumn[1] = colAdj[1] ^ colAdj[2] ^ col1[2] ^ col1[0] ^ col1[3];
-    stateColumn[2] = colAdj[2] ^ colAdj[3] ^ col1[3] ^ col1[0] ^ col1[1];
-    stateColumn[3] = colAdj[3] ^ colAdj[0] ^ col1[0] ^ col1[1] ^ col1[2];
+void mixColumns(uint8_t *stateColumn) {
+  uint8_t colOrg[4];//for the parts that are only being multiplied by 1
+  uint8_t colByTwo[4];//for the parts being multiplied by 2 or 3
+  uint8_t upperBit;//for storing the leftmost bit
+  /**
+  * Iterating through the state column, copying it to colOrg. The values from colOrg are
+  * multiplied by 2 and stored in colByTwo and conditionally xored by 0x1b.
+  */
+  for (int c = 0; c < 4; c++) {
+      colOrg[c] = stateColumn[c];
+      upperBit = stateColumn[c] >> 7;
+      colByTwo[c] = stateColumn[c] << 1;
+      if (upperBit == 1) {
+        colByTwo[c] = colByTwo[c] ^ 0x1b;
+      }
+  }
+  /**
+  * Values multiplies by 2 and 3 are taken from coldAdj. Values multiplied by 1
+  * are taken from col1. An extra value is added in for the valued multiplied by 3
+  */
+  stateColumn[0] = colByTwo[0] ^ (colByTwo[1] ^ colOrg[1]) ^ colOrg[2] ^ colOrg[3];
+  stateColumn[1] = colOrg[0] ^ colByTwo[1] ^ (colByTwo[2] ^ colOrg[2]) ^ colOrg[3];
+  stateColumn[2] = colOrg[0] ^ colOrg[1] ^ colByTwo[2] ^ (colByTwo[3] ^ colOrg[3]);
+  stateColumn[3] = (colByTwo[0] ^ colOrg[0]) ^ colOrg[1] ^ colOrg[2] ^ colByTwo[3];
 }
